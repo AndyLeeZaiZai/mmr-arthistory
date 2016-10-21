@@ -32,10 +32,21 @@ class TestEHDFeatures(unittest.TestCase):
     def test_EHDFeatures(self):
         """Should output the designated features of EHD"""
         thispath = os.path.dirname(__file__)
-        impath = os.path.join("test", "opencv-logo.png")
-        img = cv2.imread(os.path.join(thispath, impath))
-        features = EHDFeatures(img)
-        print(features)
+        impath1 = os.path.join("test", "1240.jpg")
+        img1 = cv2.imread(os.path.join(thispath, impath1))
+        a = EHDFeatures(img1)
+        impath2 = os.path.join("test", "1239.jpg")
+        img2 = cv2.imread(os.path.join(thispath, impath2))
+        b = EHDFeatures(img2)
+        impath3 = os.path.join("test", "1238.jpg")
+        img3 = cv2.imread(os.path.join(thispath, impath3))
+        c = EHDFeatures(img3)
+        AandB = np.sum(np.square(a-b))
+        AandC = np.sum(np.square(a-c))
+        print a
+        print
+        print AandB
+        print AandC
 
 # This if statement gets executed when you run this file, so > python color.py
 if __name__ == '__main__':
