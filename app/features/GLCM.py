@@ -2,6 +2,7 @@ import unittest
 import cv2
 import numpy as np
 import os
+from scipy.spatial import distance
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
 from scipy.misc import imread
@@ -12,22 +13,23 @@ def GLCMFeatures(image):
 
     Coded by An Li
     """
-    edges = cv2.Canny(image, 100, 200)
-    EdgeImg = plt.imshow(edges, cmap = 'gray')
-    plt.subplot(111), plt.imshow(edges, cmap = 'gray')
-    plt.xticks([]), plt.yticks([])
-    plt.savefig('test\Cannyedge.png', transparent = True, bbox_inches = 'tight')
-    img = cv2.imread('test\Cannyedge.png')
-    GrayImg = rgb2gray(img)
-    #g = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    glcms = greycomatrix(GrayImg, [1], [0, np.pi/4, np.pi/2, 3*np.pi/4], levels=4, normed=True)
-    os.remove("test/Cannyedge.png")
+
+    GrayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    glcms = greycomatrix(GrayImg, [1], [0, np.pi/4, np.pi/2, 3*np.pi/4], levels=256, normed=True)
     results = greycoprops(glcms, 'contrast')
     results = np.concatenate((results, greycoprops(glcms, 'dissimilarity')))
     results = np.concatenate((results, greycoprops(glcms, 'homogeneity')))
     results = np.concatenate((results, greycoprops(glcms, 'energy')))
     results = np.concatenate((results, greycoprops(glcms, 'correlation')))
+    results = results.flatten()
     return results
+
+#Call this fucntion to measure the similarity of two feature vectors of EHD
+def compareGLCMFeatures(image1, image2):
+    feature1 = GLCMFeatures(image1)
+    feature2 = GLCMFeatures(image2)
+    return distance.braycurtis(feature1, feature2)
+
 
 ################################################################################
 # TESTS
@@ -40,10 +42,13 @@ class TestGLCMFeatures(unittest.TestCase):
     def test_GLCMFeatures(self):
         """Should output the designated features of GCLM"""
         thispath = os.path.dirname(__file__)
-        impath = os.path.join("test", "703.jpg")
-        img = cv2.imread(os.path.join(thispath, impath))
-        features = GLCMFeatures(img)
-        print features
+        impath1 = os.path.join("test", "740.jpg")
+        img1 = cv2.imread(os.path.join(thispath, impath1))
+        impath2 = os.path.join("test", "741.jpg")
+        img2 = cv2.imread(os.path.join(thispath, impath2))
+        print compareGLCMFeatures(img1, img2)
+
+
 
 # This if statement gets executed when you run this file, so > python color.py
 if __name__ == '__main__':
